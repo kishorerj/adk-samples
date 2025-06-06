@@ -46,7 +46,8 @@ image_scoring = LoopAgent(
     sub_agents=[
         llm_news_image_generation, # First, run your sequential process [1]
         checker_agent_instance              # Second, check the condition and potentially stop the loop [1]
-    ]
+    ],
+    before_agent_callback=set_session
 )
 root_agent = image_scoring
-#app = AdkApp(agent=root_agent, artifact_service_builder= InMemoryArtifactService())
+

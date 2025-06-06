@@ -9,7 +9,7 @@ from google.cloud import storage
 from ... import config
 
 image_uris=[]
-client = genai.Client(api_key=config.GEMINI_API_KEY)
+client = genai.Client()
 def generate_images(prompt: str,  tool_context: ToolContext):
 
     try:
