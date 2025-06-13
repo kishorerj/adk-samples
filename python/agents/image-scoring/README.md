@@ -57,13 +57,6 @@ The Image Scoring Agent implements a sequential workflow using the following sub
    * Compares total score against configured threshold (default: 10)
    * Controls workflow termination based on score or iteration limits
 
-### Configuration (`config.py`)
-The agent's behavior is controlled by the following configuration parameters:
-* `GCS_BUCKET_NAME`: Storage bucket for generated images
-* `SCORE_THRESHOLD`: Minimum score required for image acceptance (default: 10)
-* `MAX_ITERATIONS`: Maximum number of generation attempts (default: 2)
-* `IMAGEN_MODEL`: Imagen model version for image generation
-* `GENAI_MODEL`: Gemini model version for prompt generation and scoring
 
 ### Workflow Sequence
 1. The workflow starts with the Prompt Generation Agent creating an optimized prompt
@@ -117,7 +110,15 @@ The agent's behavior is controlled by the following configuration parameters:
         export GOOGLE_CLOUD_LOCATION=<your-project-location>
         export GOOGLE_CLOUD_STORAGE_BUCKET=<your-storage-bucket>  # Only required for deployment on Agent Engine
         ```
+        *  Configuration (`config.py`)
+        The agent's behavior is controlled by the following configuration parameters:
+        `GCS_BUCKET_NAME`: Storage bucket for generated images
+        `SCORE_THRESHOLD`: Minimum score required for image acceptance (default: 10)
+        `MAX_ITERATIONS`: Maximum number of generation attempts (default: 2)
+        `IMAGEN_MODEL`: Imagen model version for image generation
+        `GENAI_MODEL`: Gemini model version for prompt generation and scoring
 
+    ```python
     *   Authenticate your GCloud account.
 
         ```bash
@@ -148,7 +149,7 @@ a chatbot interface will appear on the right. The conversation is initially
 blank. Here are some example requests you may ask the Image Scoring Agent to process:
 
 *   ` a peaceful mountain landscape at sunset`
-*   `professional office environment in  bangalore `
+*   `a cat riding a bicycle  `
 
 **Programmatic Access**
 
@@ -203,6 +204,25 @@ To delete the deployed agent, you may run the following command:
 ```bash
 poetry run python3 deployment/deploy.py --delete --resource_id=${AGENT_ENGINE_ID}
 ```
+
+## Evaluating the Deployment
+
+For running tests and evaluation, install the extra dependencies:
+
+```bash
+poetry install --with dev
+```
+
+Then the tests and evaluation can be run from the `image_scoring` directory using
+the `pytest` module:
+
+```bash
+poetry run pytest eval
+```
+
+`eval` is a demonstration of how to evaluate the agent, using the
+`AgentEvaluator` in ADK. It sends a couple requests to the agent and expects
+that the agent's responses match a pre-defined response reasonably well.
 
 ## Customization
 

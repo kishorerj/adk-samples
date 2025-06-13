@@ -1,0 +1,7 @@
+[
+  {
+    "query": "A shepherd along with sheeps on a grassland",
+    "expected_tool_use": [],
+    "reference": "I will revise the prompts based on the rules provided and come up with positive and negative image generation prompts."
+  }
+]

@@ -1,39 +1,41 @@
 import datetime, uuid
 from zoneinfo import ZoneInfo
-from google.adk.agents import Agent
 from .sub_agents.prompt import image_generation_prompt_agent as image_prompt
 from .sub_agents.image import image_generation_agent as image_gen
 from .sub_agents.scoring import scoring_images_prompt as scoring_prompt
-from google.adk.artifacts import InMemoryArtifactService
-from google.adk.sessions import InMemorySessionService
-#import checker_agent_instance
 from .checker_agent import checker_agent_instance
 from google.adk.agents import SequentialAgent, LoopAgent
 from google.adk.agents.callback_context import CallbackContext
 
-
-from vertexai.preview.reasoning_engines import AdkApp
 
 def set_session(callback_context: CallbackContext):
     """
     Sets a unique ID and timestamp in the callback context's state.
     This function is called before the main_loop_agent executes.
     """
-    
-    callback_context.state['unique_id'] = str(uuid.uuid4())
-    callback_context.state['timestamp'] = datetime.datetime.now(ZoneInfo("UTC")).isoformat()
-    print(f"Callback set_session: unique_id='{callback_context.state['unique_id']}', timestamp='{callback_context.state['timestamp']}'")
 
-llm_news_image_generation = SequentialAgent(
-    name='image_generation_scoring_agent',
+    callback_context.state["unique_id"] = str(uuid.uuid4())
+    callback_context.state["timestamp"] = datetime.datetime.now(
+        ZoneInfo("UTC")
+    ).isoformat()
+
+
+# This agent is responsible for generating and scoring images based on input text.
+# It uses a sequential process to:
+# 1. Create an image generation prompt from the input text
+# 2. Generate images using the prompt
+# 3. Score the generated images
+# The process continues until either:
+# - The image score meets the quality threshold
+# - The maximum number of iterations is reached
+
+image_generation_scoring_agent = SequentialAgent(
+    name="image_generation_scoring_agent",
     description=(
-        'Analyzes a news article and creates the image generation prompt, generates the relevant images with imagen3 and scores the images.' \
-        'if the total_score is greater than 20 stop the execution' 
-        
+        "Analyzes a news article and creates the image generation prompt, generates the relevant images with imagen3 and scores the images."
     ),
-    sub_agents=[image_prompt, image_gen, scoring_prompt]
+    sub_agents=[image_prompt, image_gen, scoring_prompt],
 )
-
 
 
 # --- 5. Define the Loop Agent ---
@@ -41,13 +43,12 @@ llm_news_image_generation = SequentialAgent(
 # It will continue looping until one of its sub_agents (specifically, the checker_agent's tool)
 # sets tool_context.actions.escalate = True.
 image_scoring = LoopAgent(
-    name="main_loop_agent",
+    name="image_scoring",
     description="Repeatedly runs a sequential process and checks a termination condition.",
     sub_agents=[
-        llm_news_image_generation, # First, run your sequential process [1]
-        checker_agent_instance              # Second, check the condition and potentially stop the loop [1]
+        image_generation_scoring_agent,  # First, run your sequential process [1]
+        checker_agent_instance,  # Second, check the condition and potentially stop the loop [1]
     ],
-    before_agent_callback=set_session
+    before_agent_callback=set_session,
 )
 root_agent = image_scoring
-

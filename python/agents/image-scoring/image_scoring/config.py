@@ -1,5 +1,5 @@
 GCS_BUCKET_NAME = ""
 SCORE_THRESHOLD = 45
-MAX_ITERATIONS=3
-IMAGEN_MODEL= 'imagen-3.0-generate-002'
-GENAI_MODEL='gemini-2.0-flash'
+MAX_ITERATIONS = 1
+IMAGEN_MODEL = "imagen-3.0-generate-002"
+GENAI_MODEL = "gemini-2.0-flash"
